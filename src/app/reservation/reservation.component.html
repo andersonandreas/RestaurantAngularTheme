@@ -1,0 +1,75 @@
+<div class="container mx-auto p-4">
+  <mat-card class="max-w-lg mx-auto">
+    <mat-card-header>
+      <mat-card-title>Make a Reservation</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="reservationForm" (ngSubmit)="onSubmit()" class="flex flex-col space-y-4">
+        <mat-form-field appearance="fill">
+          <mat-label>Choose a date</mat-label>
+          <input matInput [matDatepicker]="picker" formControlName="date">
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Choose a time</mat-label>
+          <mat-select formControlName="time">
+            @for (time of timeOptions; track time) {
+            <mat-option [value]="time">{{time}}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Number of Guests</mat-label>
+          <mat-select formControlName="guests">
+            @for (option of guestOptions; track option) {
+            <mat-option [value]="option">{{option}}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" type="button" (click)="loadAvailableSlots()"
+          [disabled]="reservationForm.controls.date.invalid || reservationForm.controls.time.invalid || reservationForm.controls.guests.invalid">
+          Find Available Slots
+        </button>
+
+        @if (availableSlots.length > 0) {
+        <mat-form-field appearance="fill">
+          <mat-label>Choose a reservation slot</mat-label>
+          <mat-select formControlName="tableCapacity" (selectionChange)="onSlotSelect($event.value)">
+            @for (slot of availableSlots; track slot.at) {
+            <mat-option [value]="slot">
+              {{slot.at | date:'HH:mm'}} ({{ getAvailableTablesCount(slot) }} tables available)
+            </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        }
+
+        <mat-form-field appearance="fill">
+          <mat-label>Name</mat-label>
+          <input matInput formControlName="name">
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" formControlName="email">
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" type="submit" [disabled]="reservationForm.invalid">
+          Book Now
+        </button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  @if (confirmationMessage) {
+  <mat-card class="mt-4 max-w-lg mx-auto">
+    <mat-card-content>
+      <p class="text-green-600">{{confirmationMessage}}</p>
+    </mat-card-content>
+  </mat-card>
+  }
+</div>
